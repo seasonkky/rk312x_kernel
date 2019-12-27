@@ -25,6 +25,125 @@
 		rockchip,remote_wakeup;
 		rockchip,usb_irq_wakeup;
 	};
+
+	leds {
+                status = "okay";
+                compatible = "gpio-leds";
+		pinctrl-names = "default";
+                pinctrl-0 = <&hub_pwr>;
+		pinctrl-1 = <&hub_rst>;
+
+                HUB_PWR {
+                        gpios = <&gpio1 GPIO_B6 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+                };
+                HUB_RST {
+                        gpios = <&gpio2 GPIO_C7 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+                };
+		USB_DRV {
+			gpios = <&gpio0 GPIO_B0 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		WIFI_PWR {
+			gpios = <&gpio0 GPIO_B4 GPIO_ACTIVE_HIGH>;
+                        default-state = "off";
+		};
+		USB_PWR1 {
+			gpios = <&gpio1 GPIO_C0 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		USB_PWR2 {
+			gpios = <&gpio1 GPIO_B7 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		USB_PWR3 {
+			gpios = <&gpio1 GPIO_C1 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		USB_PWR4 {
+			gpios = <&gpio1 GPIO_A7 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		0B1 {
+			gpios = <&gpio0 GPIO_B1 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		2B0 {
+			gpios = <&gpio2 GPIO_B0 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		2B1 {
+			gpios = <&gpio2 GPIO_B1 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		2B2 {
+			gpios = <&gpio2 GPIO_B2 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		2B3 {
+			gpios = <&gpio2 GPIO_B3 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		2B4 {
+			gpios = <&gpio2 GPIO_B4 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		2B5 {
+			gpios = <&gpio2 GPIO_B5 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		2B6 {
+			gpios = <&gpio2 GPIO_B6 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		2B7 {
+			gpios = <&gpio2 GPIO_B7 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		1C5 {
+                        gpios = <&gpio1 GPIO_C5 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+                };
+        };
+
+	wireless-wlan {
+                compatible = "wlan-platdata";
+                wifi_chip_type = "ap6212";
+                //sdio_vref = <3300>; //1800mv or 3300mv
+                //keep_wifi_power_on;
+
+                //WIFI,reset_gpio = <&gpio0 GPIO_B4 GPIO_ACTIVE_LOW>;
+                WIFI,poweren_gpio = <&gpio3 GPIO_D3 GPIO_ACTIVE_HIGH>;
+                WIFI,host_wake_irq = <&gpio3 GPIO_C7 GPIO_ACTIVE_HIGH>;
+
+                satus = "okay";
+        };
+
+        wireless-bluetooth {
+                compatible = "bluetooth-platdata";
+                uart_rts_gpios = <&gpio0 GPIO_C1 GPIO_ACTIVE_LOW>;
+                pinctrl-names = "default","rts_gpio";
+                pinctrl-0 = <&uart0_rts>;
+                pinctrl-1 = <&uart0_rts_gpio>;
+
+                //BT,power_gpio = <&gpio1 GPIO_A3 GPIO_ACTIVE_LOW>;
+                BT,reset_gpio = <&gpio3 GPIO_C5 GPIO_ACTIVE_HIGH>;
+                BT,wake_gpio = <&gpio3 GPIO_C4 GPIO_ACTIVE_HIGH>;
+                BT,wake_host_irq = <&gpio3 GPIO_C6 GPIO_ACTIVE_HIGH>;
+
+                status = "okay";
+        };
+};
+
+&uart0 {
+        status = "okay";
+        dma-names = "!tx", "!rx";
+        pinctrl-0 = <&uart0_xfer &uart0_cts>;
+};
+
+&uart1 {
+        status = "okay";
 };
 
 &fb {
@@ -90,17 +209,17 @@
 	};
 };
 &codec {
-	spk_ctl_io = <&gpio1 GPIO_B3 GPIO_ACTIVE_HIGH>;
+	spk_ctl_io = <&gpio0 GPIO_D6 GPIO_ACTIVE_HIGH>;
         spk-mute-delay = <200>;
         hp-mute-delay = <100>;
         rk312x_for_mid = <1>;
-        is_rk3128 = <0>;
+        is_rk3128 = <1>;
         spk_volume = <25>;
         hp_volume = <25>;
         capture_volume = <26>;
         gpio_debug = <1>;
         codec_hp_det = <0>;
-	status = "disabled";
+	status = "okay";
 };
 
 &rk3128_cif_sensor{
