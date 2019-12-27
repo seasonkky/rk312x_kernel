@@ -613,15 +613,15 @@
 		};
 	};
 	battery {
-                ocv_table = <3350 3677 3693 3719 3752 3770 3775 3778 3785 3796 3812 3839 3881 3907 3933 3958 3978 4033 4087 4123 4174>;
-                design_capacity = <2100>;
-                design_qmax = <2200>;
+                ocv_table = <3400 3538 3629 3712 3741 3759 3767 3771 3778 3792 3813 3844 3893 3933 3970 4011 4066 4116 4170 4228 4306>;
+                design_capacity = <8000>;
+                design_qmax = <8200>;
                 max_overcharge = <100>;
-                bat_res = <80>;
+                bat_res = <100>;
                 max_input_currentmA  = <2000>;
                 max_chrg_currentmA = <1800>;
-                max_charge_voltagemV = <4200>;
-                max_bat_voltagemV = <4200>;
+                max_charge_voltagemV = <4350>;
+                max_bat_voltagemV = <4350>;
                 sleep_enter_current = <300>;
                 sleep_exit_current = <300>;
                 power_off_thresd = <3400>;
