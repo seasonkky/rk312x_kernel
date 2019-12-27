@@ -166,7 +166,7 @@
 	};
 	act8931: act8931@5b {
 		reg = <0x5b>;
-		status = "okay";
+		status = "disabled";
 	};
 	rt5025: rt5025@35 {
 			compatible = "rt,rt5025";
@@ -181,7 +181,7 @@
 };
 
 &i2c1 {
-	status = "okay";
+	status = "disabled";
 
 	rk816: rk816@1a {
 		reg = <0x1a>;
@@ -190,7 +190,7 @@
 };
 
 &i2c2 {
-	status = "okay";
+	status = "disabled";
 	ts@55 {
 		compatible = "goodix,gt8xx";
 		reg = <0x55>;
@@ -214,7 +214,7 @@
 
 &fb {
 	rockchip,disp-mode = <ONE_DUAL>;
-	rockchip,uboot-logo-on = <0>;
+	rockchip,uboot-logo-on = <1>;
 };
 
 
@@ -450,7 +450,7 @@
 
 /include/ "rk818.dtsi"
 &rk818 {
-	gpios =<&gpio1 GPIO_B1 GPIO_ACTIVE_HIGH>,<&gpio1 GPIO_A1 GPIO_ACTIVE_LOW>;
+	gpios =<&gpio1 GPIO_B3 GPIO_ACTIVE_HIGH>,<&gpio3 GPIO_C1 GPIO_ACTIVE_LOW>;
 	rk818,system-power-controller;
 	rk818,support_dc_chg = <1>;/*1: dc chg; 0:usb chg*/
 
@@ -554,12 +554,12 @@
 
 		rk818_ldo5_reg: regulator@8 {
 			regulator-name= "rk818_ldo5";
-			regulator-min-microvolt = <3000000>;
-			regulator-max-microvolt = <3000000>;
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
 			regulator-initial-state = <3>;
 			regulator-state-mem {
 				regulator-state-enabled;
-				regulator-state-uv = <3000000>;
+				regulator-state-uv = <1800000>;
 			};
 		};
 
