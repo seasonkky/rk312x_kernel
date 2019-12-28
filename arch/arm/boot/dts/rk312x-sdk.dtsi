@@ -191,25 +191,31 @@
 
 &i2c2 {
 	status = "disabled";
-	ts@55 {
-		compatible = "goodix,gt8xx";
-		reg = <0x55>;
-		touch-gpio = <&gpio1 GPIO_B0 IRQ_TYPE_LEVEL_LOW>;
-		reset-gpio = <&gpio2 GPIO_C1 GPIO_ACTIVE_LOW>;
-		//power-gpio = <&gpio0 GPIO_C5 GPIO_ACTIVE_LOW>;
-		max-x = <1280>;
-		max-y = <800>;
-	};
-	/*
-	ts@01 {
-		compatible = "ct,vtl_ts";
-		reg = <0x01>;
-		screen_max_x = <1280>;
-		screen_max_y = <800>;
-		irq_gpio_number = <&gpio1 GPIO_B0 IRQ_TYPE_LEVEL_LOW>;
-		rst_gpio_number = <&gpio2 GPIO_C1 GPIO_ACTIVE_HIGH>;
-	};
-	*/
+	ts@09 {
+                compatible = "wacom_i2c";
+                reg = <0x09>;
+                irq_gpios = <&gpio2 GPIO_C2 IRQ_TYPE_LEVEL_LOW>;
+                reset_gpios = <&gpio2 GPIO_C3 GPIO_ACTIVE_LOW>;
+		ctl_gpios = <&gpio2 GPIO_C0 GPIO_ACTIVE_LOW>;
+		cfg_gpios = <&gpio2 GPIO_C1 GPIO_ACTIVE_LOW>;
+                max-x = <720>;
+                max-y = <1280>;
+                tp-size = <0>;
+                status = "okay";
+        };
+};
+
+&i2c3 {
+	status = "okay";
+
+	touchscreen@40 {
+                compatible = "gslX680";
+                reg = <0x40>;
+                touch-gpio = <&gpio1 GPIO_B0 IRQ_TYPE_LEVEL_LOW>;
+                reset-gpio = <&gpio0 GPIO_A2 GPIO_ACTIVE_HIGH>;
+                max-x = <1280>;
+                max-y = <800>;
+        };
 };
 
 &fb {
@@ -597,12 +603,12 @@
 		};
 		rk818_ldo9_reg: regulator@12 {
 			regulator-name= "vcc_sd";
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <3000000>;
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
 			regulator-initial-state = <3>;
 			regulator-state-mem {
 				regulator-state-enabled;
-				regulator-state-uv = <3000000>;
+				regulator-state-uv = <3300000>;
 			};
 		};
 		rk818_ldo10_reg: regulator@13 {
@@ -628,11 +634,11 @@
                 chrg_diff_voltagemV = <0>;
                 virtual_power = <0>;
                 support_usb_adp = <0>;
-                support_dc_adp = <0>;
+                support_dc_adp = <1>;
                 power_dc2otg = <0>;
         };
         test-power{
-		status = "okay";
+		status = "disabled";
 	};
 
 };

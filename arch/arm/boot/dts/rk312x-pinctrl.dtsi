@@ -916,7 +916,16 @@
 		};
 
 		//to add 
-
+		gpio_usb {
+			hub_rst: hub-rst {
+                                rockchip,pins = <GPIO2_C7>;
+                                rockchip,pull = <VALUE_PULL_DEFAULT>;
+			};
+			hub_pwr: hub-pwr {
+                                rockchip,pins = <GPIO1_B6>;
+                                rockchip,pull = <VALUE_PULL_DEFAULT>;
+			};
+		};
 		
 	};	
 
