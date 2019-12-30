@@ -180,6 +180,11 @@
 				rockchip,pull = <VALUE_PULL_DEFAULT>;
 				
 			};
+			uart2_cts_gpio: uart2-cts-gpio {
+                                rockchip,pins = <FUNC_TO_GPIO(UART2_CTSN)>;
+                                rockchip,pull = <VALUE_PULL_DEFAULT>;
+
+                        };
 		};
 
 
@@ -253,14 +258,14 @@
 		gpio0_i2c3 {
 			i2c3_sda:i2c3-sda {
 				rockchip,pins = <I2C3_SDA>;
-				rockchip,pull = <VALUE_PULL_DEFAULT>;
+				rockchip,pull = <VALUE_PULL_UP>;
 				
 				
 			};
 
 			i2c3_scl:i2c3-scl {
 				rockchip,pins = <I2C3_SCL>;
-				rockchip,pull = <VALUE_PULL_DEFAULT>;
+				rockchip,pull = <VALUE_PULL_UP>;
 				
 				
 			};
@@ -926,7 +931,16 @@
                                 rockchip,pull = <VALUE_PULL_DEFAULT>;
 			};
 		};
-		
+		gpio_touch {
+			tp_rst: tp-rst {
+				rockchip,pins = <GPIO0_A2>;
+                                rockchip,pull = <VALUE_PULL_DEFAULT>;
+			};
+			key_pwr: key-pwr {
+				rockchip,pins = <GPIO0_D1>;
+                                rockchip,pull = <VALUE_PULL_DEFAULT>;
+			};
+		};	
 	};	
 
 };

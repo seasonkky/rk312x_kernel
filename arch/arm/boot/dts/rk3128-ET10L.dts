@@ -105,6 +105,14 @@
                         gpios = <&gpio1 GPIO_C5 GPIO_ACTIVE_HIGH>;
                         default-state = "on";
                 };
+		2C0 {
+			gpios = <&gpio2 GPIO_C0 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
+		2C1 {
+			gpios = <&gpio2 GPIO_C1 GPIO_ACTIVE_LOW>;
+                        default-state = "on";
+		};
         };
 
 	wireless-wlan {
@@ -144,6 +152,10 @@
 
 &uart1 {
         status = "okay";
+};
+
+&uart2 {
+	status = "disabled";
 };
 
 &fb {
@@ -193,14 +205,6 @@
 
 &sdmmc {
 	//cd-gpios = <&gpio1 GPIO_C1 GPIO_ACTIVE_HIGH>;/*CD GPIO*/
-};
-&key {
-		power-key {
-			gpios = <&gpio0 GPIO_A2 GPIO_ACTIVE_LOW>;
-			linux,code = <116>;
-			label = "power";
-			gpio-key,wakeup;
-		};
 };
 
 &dwc_control_usb {

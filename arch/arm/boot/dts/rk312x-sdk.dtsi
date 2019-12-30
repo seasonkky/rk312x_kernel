@@ -1,7 +1,7 @@
 
 / {
 	fiq-debugger {
-		status = "okay";
+		status = "disabled";
 	};
 
 	chosen {
@@ -111,6 +111,8 @@
 	key: key {
 		compatible = "rockchip,key";
 		io-channels = <&adc 1>;
+		pinctrl-names = "default";
+                pinctrl-0 = <&uart2_cts_gpio>;
 
 		vol-up-key {
 			linux,code = <115>;
@@ -125,7 +127,7 @@
 		};
 
 		power-key {
-			gpios = <&gpio0 GPIO_A5 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio0 GPIO_D1 GPIO_ACTIVE_LOW>;
 			linux,code = <116>;
 			label = "power";
 			gpio-key,wakeup;
@@ -190,14 +192,14 @@
 };
 
 &i2c2 {
-	status = "disabled";
+	status = "okay";
 	ts@09 {
                 compatible = "wacom_i2c";
                 reg = <0x09>;
                 irq_gpios = <&gpio2 GPIO_C2 IRQ_TYPE_LEVEL_LOW>;
                 reset_gpios = <&gpio2 GPIO_C3 GPIO_ACTIVE_LOW>;
-		ctl_gpios = <&gpio2 GPIO_C0 GPIO_ACTIVE_LOW>;
-		cfg_gpios = <&gpio2 GPIO_C1 GPIO_ACTIVE_LOW>;
+		//ctl_gpios = <&gpio2 GPIO_C0 GPIO_ACTIVE_LOW>;
+		//cfg_gpios = <&gpio2 GPIO_C1 GPIO_ACTIVE_LOW>;
                 max-x = <720>;
                 max-y = <1280>;
                 tp-size = <0>;
@@ -209,7 +211,9 @@
 	status = "okay";
 
 	touchscreen@40 {
-                compatible = "gslX680";
+                compatible = "gsl,gslX680";
+		pinctrl-names = "default";
+                pinctrl-0 = <&i2c1_gpio>;
                 reg = <0x40>;
                 touch-gpio = <&gpio1 GPIO_B0 IRQ_TYPE_LEVEL_LOW>;
                 reset-gpio = <&gpio0 GPIO_A2 GPIO_ACTIVE_HIGH>;
@@ -602,13 +606,13 @@
 			};
 		};
 		rk818_ldo9_reg: regulator@12 {
-			regulator-name= "vcc_sd";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
+			regulator-name= "rk818_ldo9";
+			regulator-min-microvolt = <2800000>;
+			regulator-max-microvolt = <2800000>;
 			regulator-initial-state = <3>;
 			regulator-state-mem {
 				regulator-state-enabled;
-				regulator-state-uv = <3300000>;
+				regulator-state-uv = <2800000>;
 			};
 		};
 		rk818_ldo10_reg: regulator@13 {
