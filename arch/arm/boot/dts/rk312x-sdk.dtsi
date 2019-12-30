@@ -90,7 +90,7 @@
 	card-detect-delay = <200>;
 	ignore-pm-notify;
 	keep-power-in-suspend;
-	vmmc-supply = <&rk818_ldo9_reg>;
+	//vmmc-supply = <&rk818_ldo9_reg>;
 	status = "disabled";
 };
 
@@ -219,6 +219,7 @@
                 reset-gpio = <&gpio0 GPIO_A2 GPIO_ACTIVE_HIGH>;
                 max-x = <1280>;
                 max-y = <800>;
+		status = "okay";
         };
 };
 

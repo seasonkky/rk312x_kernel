@@ -272,6 +272,7 @@
 		phy-mode = "rgmii";
 		pinctrl-names = "default";
 		pinctrl-0 = <&gmac_rxdv &gmac_txclk &gmac_crs &gmac_rxclk &gmac_mdio &gmac_txen &gmac_clk &gmac_rxer &gmac_rxd1 &gmac_rxd0 &gmac_txd1 &gmac_txd0 &gmac_rxd3 &gmac_rxd2 &gmac_txd2 &gmac_txd3 &gmac_col_gpio &gmac_mdc>;
+		status = "disabled";
 	};
 
 	fiq-debugger {
@@ -603,7 +604,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		pinctrl-names = "default","idle";
-		pinctrl-0 = <&sdio0_pwren &sdio0_cmd &sdio0_clk &sdio0_bus4>;
+		pinctrl-0 = <&sdio0_pwren &sdio0_clk &sdio0_bus4>;
 		pinctrl-1 = <&sdio0_gpio>;
 		clocks = <&clk_sdio>, <&clk_gates5 11>;
 		clock-names = "clk_mmc", "hclk_mmc";

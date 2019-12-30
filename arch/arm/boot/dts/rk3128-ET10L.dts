@@ -227,7 +227,7 @@
 };
 
 &rk3128_cif_sensor{
-	status = "okay";
+	status = "disabled";
 };
 
 
