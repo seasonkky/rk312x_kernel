@@ -213,7 +213,7 @@
 	touchscreen@40 {
                 compatible = "gsl,gslX680";
 		pinctrl-names = "default";
-                pinctrl-0 = <&i2c1_gpio>;
+                pinctrl-0 = <&tp_rst>;
                 reg = <0x40>;
                 touch-gpio = <&gpio1 GPIO_B0 IRQ_TYPE_LEVEL_LOW>;
                 reset-gpio = <&gpio0 GPIO_A2 GPIO_ACTIVE_HIGH>;
