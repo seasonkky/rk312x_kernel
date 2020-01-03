@@ -26,12 +26,17 @@
 		rockchip,usb_irq_wakeup;
 	};
 
+	rockchip_headset {
+                compatible = "rockchip_headset";
+                headset_gpio = <&gpio0 GPIO_D4 GPIO_ACTIVE_LOW>;
+		status = "okay";
+        };
+
 	leds {
                 status = "okay";
                 compatible = "gpio-leds";
 		pinctrl-names = "default";
-                pinctrl-0 = <&hub_pwr>;
-		pinctrl-1 = <&hub_rst>;
+                pinctrl-0 = <&hub_pwr &hub_rst &gpio_1c5>;
 
                 HUB_PWR {
                         gpios = <&gpio1 GPIO_B6 GPIO_ACTIVE_HIGH>;
@@ -101,10 +106,12 @@
 			gpios = <&gpio2 GPIO_B7 GPIO_ACTIVE_HIGH>;
                         default-state = "on";
 		};
+
 		1C5 {
                         gpios = <&gpio1 GPIO_C5 GPIO_ACTIVE_HIGH>;
                         default-state = "on";
                 };
+
 		2C0 {
 			gpios = <&gpio2 GPIO_C0 GPIO_ACTIVE_HIGH>;
                         default-state = "on";
@@ -197,10 +204,6 @@
 
 &hdmi {
         status = "disabled";
-};
-
-&sdmmc {
-	//cd-gpios = <&gpio1 GPIO_C1 GPIO_ACTIVE_HIGH>;/*CD GPIO*/
 };
 
 &dwc_control_usb {

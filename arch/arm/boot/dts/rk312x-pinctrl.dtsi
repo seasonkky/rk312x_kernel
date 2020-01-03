@@ -940,6 +940,12 @@
 				rockchip,pins = <GPIO0_D1>;
                                 rockchip,pull = <VALUE_PULL_DEFAULT>;
 			};
+		};
+		gpio_ck {
+			gpio_1c5: gpio-1c5 {
+				rockchip,pins = <GPIO1_C5>;
+                                rockchip,pull = <VALUE_PULL_DOWN>;
+			};
 		};	
 	};	
 
