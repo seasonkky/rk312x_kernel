@@ -356,7 +356,7 @@ static int wacom_i2c_init(void)
 	return i2c_add_driver(&wacom_i2c_driver);
 }
 
-module_init(wacom_i2c_init);
+late_initcall(wacom_i2c_init);
 module_exit(wacom_i2c_exit);
 //module_i2c_driver(wacom_i2c_driver);
 
