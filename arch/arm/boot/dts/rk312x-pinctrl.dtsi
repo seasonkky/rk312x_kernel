@@ -946,6 +946,10 @@
 				rockchip,pins = <GPIO1_C5>;
                                 rockchip,pull = <VALUE_PULL_DOWN>;
 			};
+			gpio_2c0: gpio-2c0 {
+				rockchip,pins = <FUNC_TO_GPIO(LCDC0_D14)>;
+				rockchip,pull = <VALUE_PULL_DEFAULT>; 
+			};
 		};	
 	};	
 

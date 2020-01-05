@@ -195,11 +195,12 @@
 	status = "okay";
 	ts@09 {
                 compatible = "wacom_i2c";
+		pinctrl-names = "default";
+                pinctrl-0 = <&gpio_2c0>;
                 reg = <0x09>;
                 irq_gpios = <&gpio2 GPIO_C2 IRQ_TYPE_LEVEL_LOW>;
                 reset_gpios = <&gpio2 GPIO_C3 GPIO_ACTIVE_LOW>;
-		//ctl_gpios = <&gpio2 GPIO_C0 GPIO_ACTIVE_LOW>;
-		//cfg_gpios = <&gpio2 GPIO_C1 GPIO_ACTIVE_LOW>;
+		ctl_gpios = <&gpio2 GPIO_C0 GPIO_ACTIVE_LOW>;
                 max-x = <720>;
                 max-y = <1280>;
                 tp-size = <0>;
@@ -219,7 +220,7 @@
                 reset-gpio = <&gpio0 GPIO_A2 GPIO_ACTIVE_HIGH>;
                 max-x = <1280>;
                 max-y = <800>;
-		status = "okay";
+		status = "disabled";
         };
 };
 
@@ -641,6 +642,8 @@
                 support_usb_adp = <0>;
                 support_dc_adp = <1>;
                 power_dc2otg = <0>;
+		dc_det_adc = <1>;
+		io-channels = <&adc 0>;
         };
         test-power{
 		status = "disabled";

@@ -252,6 +252,15 @@ static int wacom_i2c_probe(struct i2c_client *client,
 
 	int irq_pin = of_get_named_gpio_flags(np, "irq_gpios", 0, (enum of_gpio_flags *)&irq_flags);
 	int rst_pin = of_get_named_gpio_flags(np, "reset_gpios", 0, (enum of_gpio_flags *)&irq_flags);
+	int ctl_pin = of_get_named_gpio_flags(np, "ctl_gpios", 0, (enum of_gpio_flags *)&irq_flags);
+
+       gpio_request(ctl_pin,"wacom_ctl");
+       gpio_direction_output(ctl_pin,1);
+       gpio_set_value(ctl_pin,1);
+       mdelay(200);
+       gpio_set_value(ctl_pin,0);
+       mdelay(100);
+
 	gpio_request(rst_pin,"wacom_rst");
 	gpio_set_value(rst_pin,0);
 	mdelay(500);	

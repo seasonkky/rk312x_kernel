@@ -119,6 +119,12 @@
 			retain-state-suspended; //休眠保持运行
                         default-state = "on";
                 };
+
+		2C1 {
+                        gpios = <&gpio2 GPIO_C1 GPIO_ACTIVE_LOW>;
+                        retain-state-suspended; //休眠保持运行
+                        default-state = "on";
+                };
         };
 
 	wireless-wlan {
