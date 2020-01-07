@@ -220,7 +220,7 @@
                 reset-gpio = <&gpio0 GPIO_A2 GPIO_ACTIVE_HIGH>;
                 max-x = <1280>;
                 max-y = <800>;
-		status = "disabled";
+		status = "okay";
         };
 };
 
@@ -644,6 +644,7 @@
                 power_dc2otg = <0>;
 		dc_det_adc = <1>;
 		io-channels = <&adc 0>;
+		chg_red_gpio = <&gpio2 GPIO_B0 GPIO_ACTIVE_LOW>;
         };
         test-power{
 		status = "disabled";

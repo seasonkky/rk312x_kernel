@@ -340,6 +340,7 @@ struct rk81x_battery {
 	unsigned long			dischrg_save_sec;
 	unsigned long			chrg_save_sec;
 	struct timeval			suspend_rtc_base;
+	int                             chg_red_pin;
 };
 
 u32 support_usb_adp, support_dc_adp, power_dc2otg;
@@ -1871,21 +1872,13 @@ out:
 static enum charger_type rk816_bat_get_adc_dc_state(struct rk81x_battery *di)
 {
 	int val = 0;
-
-
 	struct iio_channel *channels;
 	struct iio_channel *adc_test_channel; 
-
 	struct platform_device *pdev;
-	
-
-
-
 
 	if (!di->iio_chan) {
 		di->iio_chan = iio_channel_get(di->rk818->dev, NULL);
 		if (IS_ERR(di->iio_chan)) {
-			
 			pr_err("no channel====\n");
 			di->iio_chan = NULL;
 			return 0;//DC_TYPE_NONE_CHARGER;
@@ -1908,17 +1901,16 @@ static void rk81x_battery_dc_delay_work(struct work_struct *work)
 	static int sta_bak=-1;
 	charger_type = rk81x_bat_get_dc_state(di);
 
-	charger_type=rk816_bat_get_adc_dc_state(di);
+	charger_type = rk816_bat_get_adc_dc_state(di);
+	if(charger_type == DC_CHARGER)
+		gpio_set_value(di->chg_red_pin,1);
+	else if (charger_type == NO_CHARGER)
+		gpio_set_value(di->chg_red_pin,0);
 
-if(charger_type!=sta_bak){
-
-
-
-	//printk("rk81x_battery_dc_delay_work=ccccccccccccccc=\n");
-
-	rk_send_wakeup_key();
-	sta_bak=charger_type;
-}
+	if(charger_type!=sta_bak) {
+		rk_send_wakeup_key();
+		sta_bak=charger_type;
+	}
 	if (charger_type == DC_CHARGER) {
 		rk81x_bat_set_charger_param(di, DC_CHARGER);
 		if (power_dc2otg && di->otg_online)
@@ -1934,7 +1926,7 @@ if(charger_type!=sta_bak){
 		}
 	}
 	queue_delayed_work(di->wq, &di->dc_det_check_work,
-			   msecs_to_jiffies(TIMER_MS_COUNTS * 2));
+			   msecs_to_jiffies(1000));
 }
 
 static void rk81x_battery_acusb_delay_work(struct work_struct *work)
@@ -3536,7 +3528,7 @@ static void rk81x_bat_power_supply_changed(struct rk81x_battery *di)
 			di->psy_status = POWER_SUPPLY_STATUS_FULL;
 		else
 			di->psy_status = POWER_SUPPLY_STATUS_CHARGING;
-	}
+	} 
 
 	if (state_changed) {
 		power_supply_changed(&di->bat);
@@ -4292,6 +4284,19 @@ static int rk81x_bat_parse_dt(struct rk81x_battery *di)
 		out_value = PWR_OFF_THRESD;
 	}
 	pdata->power_off_thresd = out_value;
+
+
+	enum of_gpio_flags flags;
+
+	di->chg_red_pin = of_get_named_gpio_flags(np, "chg_red_gpio", 0,&flags);
+	if (di->chg_red_pin == -EPROBE_DEFER) {
+                dev_err(dev, "chg_red_pin error\n");
+        } else {
+		gpio_request(di->chg_red_pin,"chg_red");
+                gpio_direction_output(di->chg_red_pin,0);
+		gpio_set_value(di->chg_red_pin,0);
+	}
+	
 
 	of_property_read_u32(np, "chrg_diff_voltagemV", &pdata->chrg_diff_vol);
 	of_property_read_u32(np, "virtual_power", &di->fg_drv_mode);

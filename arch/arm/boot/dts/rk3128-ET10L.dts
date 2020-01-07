@@ -74,10 +74,6 @@
 			gpios = <&gpio0 GPIO_B1 GPIO_ACTIVE_HIGH>;
                         default-state = "on";
 		};
-		2B0 {
-			gpios = <&gpio2 GPIO_B0 GPIO_ACTIVE_HIGH>;
-                        default-state = "on";
-		};
 		2B1 {
 			gpios = <&gpio2 GPIO_B1 GPIO_ACTIVE_HIGH>;
 			retain-state-suspended; //休眠保持运行
