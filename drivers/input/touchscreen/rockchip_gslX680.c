@@ -46,6 +46,8 @@
 #define FILTER_MAX	9
 #endif
 
+extern unsigned int isPenDetected;
+
 #define GSLX680_I2C_NAME 	"gslX680"
 #define GSLX680_I2C_ADDR 	0x40
 
@@ -1092,7 +1094,7 @@ queue_monitor_work:
 static irqreturn_t gsl_ts_irq(int irq, void *dev_id)
 {	
 	struct gsl_ts *ts = dev_id;
-
+	if(!isPenDetected){ 
 	print_info("========gslX680 Interrupt=========\n");				 
 
 	disable_irq_nosync(ts->irq);
@@ -1104,7 +1106,7 @@ static irqreturn_t gsl_ts_irq(int irq, void *dev_id)
 	}
 	
 	return IRQ_HANDLED;
-
+	}
 }
 
 static int gsl_ts_init_ts(struct i2c_client *client, struct gsl_ts *ts)

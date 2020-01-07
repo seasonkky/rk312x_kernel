@@ -47,6 +47,8 @@ struct wacom_i2c {
 
 int y_max1 = 0;
 int x_max1 = 0;
+//static volatile int isPenDetected = 0;
+unsigned int isPenDetected = 0;
 static int wacom_query_device(struct i2c_client *client,
 			      struct wacom_features *features)
 {
@@ -155,7 +157,9 @@ static irqreturn_t wacom_i2c_irq(int irq, void *dev_id)
 			y = y + (y - 0x1300)*12/100;
 	}*/
 	pressure = le16_to_cpup((__le16 *)&data[8]);
-
+	
+	if(pressure > 0)
+		isPenDetected = 1;
 	if (!wac_i2c->prox)
 		wac_i2c->tool = (data[3] & 0x0c) ?
 			BTN_TOOL_RUBBER : BTN_TOOL_PEN;
@@ -171,9 +175,9 @@ static irqreturn_t wacom_i2c_irq(int irq, void *dev_id)
 	input_report_abs(input, ABS_X, x); 
 	input_report_abs(input, ABS_Y, y); 
 	
-
 	input_report_abs(input, ABS_PRESSURE, pressure);
 	input_sync(input);
+	isPenDetected = 0;
 
 out:
 	return IRQ_HANDLED;
