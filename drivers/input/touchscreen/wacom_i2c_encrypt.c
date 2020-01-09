@@ -30,6 +30,10 @@
 #define WACOM_CMD_THROW1	0x00
 #define WACOM_QUERY_SIZE	32
 
+int irq_pin;
+int rst_pin;
+int ctl_pin;
+
 struct wacom_features {
 	int x_max;
 	int y_max;
@@ -160,6 +164,8 @@ static irqreturn_t wacom_i2c_irq(int irq, void *dev_id)
 	
 	if(pressure > 0)
 		isPenDetected = 1;
+	else
+		isPenDetected = 0;
 	if (!wac_i2c->prox)
 		wac_i2c->tool = (data[3] & 0x0c) ?
 			BTN_TOOL_RUBBER : BTN_TOOL_PEN;
@@ -177,7 +183,6 @@ static irqreturn_t wacom_i2c_irq(int irq, void *dev_id)
 	
 	input_report_abs(input, ABS_PRESSURE, pressure);
 	input_sync(input);
-	isPenDetected = 0;
 
 out:
 	return IRQ_HANDLED;
@@ -254,16 +259,16 @@ static int wacom_i2c_probe(struct i2c_client *client,
 
 	input_set_drvdata(input, wac_i2c);
 
-	int irq_pin = of_get_named_gpio_flags(np, "irq_gpios", 0, (enum of_gpio_flags *)&irq_flags);
-	int rst_pin = of_get_named_gpio_flags(np, "reset_gpios", 0, (enum of_gpio_flags *)&irq_flags);
-	int ctl_pin = of_get_named_gpio_flags(np, "ctl_gpios", 0, (enum of_gpio_flags *)&irq_flags);
+	irq_pin = of_get_named_gpio_flags(np, "irq_gpios", 0, (enum of_gpio_flags *)&irq_flags);
+	rst_pin = of_get_named_gpio_flags(np, "reset_gpios", 0, (enum of_gpio_flags *)&irq_flags);
+	ctl_pin = of_get_named_gpio_flags(np, "ctl_gpios", 0, (enum of_gpio_flags *)&irq_flags);
 
-       gpio_request(ctl_pin,"wacom_ctl");
-       gpio_direction_output(ctl_pin,1);
-       gpio_set_value(ctl_pin,1);
-       mdelay(200);
-       gpio_set_value(ctl_pin,0);
-       mdelay(100);
+        gpio_request(ctl_pin,"wacom_ctl");
+        gpio_direction_output(ctl_pin,1);
+        gpio_set_value(ctl_pin,1);
+        mdelay(200);
+        gpio_set_value(ctl_pin,0);
+        mdelay(100);
 
 	gpio_request(rst_pin,"wacom_rst");
 	gpio_set_value(rst_pin,0);
@@ -325,12 +330,23 @@ static int wacom_i2c_suspend(struct device *dev)
 
 	disable_irq(client->irq);
 
+	gpio_set_value(ctl_pin,1); // close power
+
 	return 0;
 }
 
 static int wacom_i2c_resume(struct device *dev)
 {
 	struct i2c_client *client = to_i2c_client(dev);
+
+	//resume power
+        gpio_set_value(ctl_pin,0);
+        mdelay(100);
+
+        gpio_set_value(rst_pin,0);
+        mdelay(500);
+        gpio_set_value(rst_pin,1);
+        mdelay(100);
 
 	enable_irq(client->irq);
 
