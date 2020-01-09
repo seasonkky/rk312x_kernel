@@ -29,6 +29,7 @@
 #include <linux/rockchip/cpu.h>
 #include <linux/rockchip/dvfs.h>
 #include <asm/smp_plat.h>
+#include <asm/cpu.h>
 #include <asm/unistd.h>
 #include <asm/uaccess.h>
 #include <asm/system_misc.h>
@@ -70,6 +71,8 @@ static struct cpufreq_frequency_table *freq_table = default_freq_table;
 #define CPUFREQ_PRIVATE                 0x100
 static unsigned int no_cpufreq_access = 0;
 static unsigned int suspend_freq = 816 * 1000;
+static unsigned int suspend_freq_axp=216*1000;
+static unsigned int suspend_volt_axp = 9500000;
 static unsigned int suspend_volt = 1100000;
 static unsigned int low_battery_freq = 600 * 1000;
 static unsigned int low_battery_capacity = 5; // 5%
@@ -221,6 +224,14 @@ static int cpufreq_init_cpu0(struct cpufreq_policy *policy)
 				v = freq_table[i].index;
 			}
 		}
+                v = INT_MAX;
+                for (i = 0; freq_table[i].frequency != CPUFREQ_TABLE_END; i++) {
+                        if (freq_table[i].index >= suspend_volt_axp && v > freq_table[i].index) {
+                                suspend_freq_axp = freq_table[i].frequency;
+                                v = freq_table[i].index;
+                        }
+                }
+
 	}
 	low_battery_freq = get_freq_from_table(low_battery_freq);
 	clk_enable_dvfs(clk_cpu_dvfs_node);
@@ -252,7 +263,15 @@ static int cpufreq_init(struct cpufreq_policy *policy)
 
 	policy->cpuinfo.transition_latency = 40 * NSEC_PER_USEC;	// make ondemand default sampling_rate to 40000
 
-	cpumask_setall(policy->cpus);
+	/*
+	 * On SMP configuartion, both processors share the voltage
+	 * and clock. So both CPUs needs to be scaled together and hence
+	 * needs software co-ordination. Use cpufreq affected_cpus
+	 * interface to handle this scenario. Additional is_smp() check
+	 * is to keep SMP_ON_UP build working.
+	 */
+	if (is_smp())
+		cpumask_setall(policy->cpus);
 
 	return 0;
 
@@ -365,7 +384,7 @@ static int cpufreq_pm_notifier_event(struct notifier_block *this, unsigned long 
 	switch (event) {
 	case PM_SUSPEND_PREPARE:
 		policy->cur++;
-		ret = cpufreq_driver_target(policy, suspend_freq, DISABLE_FURTHER_CPUFREQ | CPUFREQ_RELATION_H);
+		ret = cpufreq_driver_target(policy, suspend_freq_axp, DISABLE_FURTHER_CPUFREQ | CPUFREQ_RELATION_H);
 		if (ret < 0) {
 			ret = NOTIFY_BAD;
 			goto out;
@@ -378,7 +397,7 @@ static int cpufreq_pm_notifier_event(struct notifier_block *this, unsigned long 
 		//will return, and our target will not be called, it casue
 		//ENABLE_FURTHER_CPUFREQ flag invalid, avoid that.
 		policy->cur++;
-		cpufreq_driver_target(policy, suspend_freq, ENABLE_FURTHER_CPUFREQ | CPUFREQ_RELATION_H);
+		cpufreq_driver_target(policy, suspend_freq_axp, ENABLE_FURTHER_CPUFREQ | CPUFREQ_RELATION_H);
 		ret = NOTIFY_OK;
 		break;
 	}
