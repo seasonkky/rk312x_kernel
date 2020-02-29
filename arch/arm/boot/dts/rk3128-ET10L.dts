@@ -19,7 +19,7 @@
 	usb_control {
 		compatible = "rockchip,rk3126-usb-control";
 
-		//host_drv_gpio = <&gpio3 GPIO_C4 GPIO_ACTIVE_LOW>;
+		host_drv_gpio = <&gpio0 GPIO_B6 GPIO_ACTIVE_LOW>;
 		//otg_drv_gpio = <&gpio3 GPIO_C1 GPIO_ACTIVE_LOW>;
 
 		rockchip,remote_wakeup;
@@ -38,7 +38,7 @@
 		pinctrl-names = "default";
                 pinctrl-0 = <&hub_pwr &hub_rst &gpio_1c5>;
 
-                HUB_PWR {
+                UART_PWR {
                         gpios = <&gpio1 GPIO_B6 GPIO_ACTIVE_HIGH>;
                         default-state = "on";
                 };

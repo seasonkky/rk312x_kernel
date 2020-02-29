@@ -33,7 +33,9 @@
 int irq_pin;
 int rst_pin;
 int ctl_pin;
-
+#define SCR_X 1280
+#define SCR_Y 720
+#define MAX_PRESSURE  4095
 struct wacom_features {
 	int x_max;
 	int y_max;
@@ -161,7 +163,11 @@ static irqreturn_t wacom_i2c_irq(int irq, void *dev_id)
 			y = y + (y - 0x1300)*12/100;
 	}*/
 	pressure = le16_to_cpup((__le16 *)&data[8]);
-	
+
+	x = (x * SCR_X)/x_max1;
+	y = (y * SCR_Y)/y_max1;
+
+
 	if(pressure > 0)
 		isPenDetected = 1;
 	else
@@ -251,11 +257,11 @@ static int wacom_i2c_probe(struct i2c_client *client,
 	__set_bit(BTN_STYLUS2, input->keybit);
 	__set_bit(BTN_TOUCH, input->keybit);
 	
-
-	input_set_abs_params(input, ABS_X, 0, features.x_max, 0, 0);
-	input_set_abs_params(input, ABS_Y, 0, features.y_max, 0, 0);
-	input_set_abs_params(input, ABS_PRESSURE,
-			     0, features.pressure_max, 0, 0);
+	__set_bit(INPUT_PROP_DIRECT, input->propbit);
+	input_set_abs_params(input, ABS_X, 0, SCR_X, 0, 0);
+	input_set_abs_params(input, ABS_Y, 0, SCR_Y, 0, 0);
+        input_set_abs_params(input, ABS_PRESSURE,
+                             0, MAX_PRESSURE, 0, 0);
 
 	input_set_drvdata(input, wac_i2c);
 
@@ -264,13 +270,20 @@ static int wacom_i2c_probe(struct i2c_client *client,
 	ctl_pin = of_get_named_gpio_flags(np, "ctl_gpios", 0, (enum of_gpio_flags *)&irq_flags);
 
         gpio_request(ctl_pin,"wacom_ctl");
-        gpio_direction_output(ctl_pin,1);
+        //gpio_direction_output(ctl_pin,1);
+
+	gpio_request(rst_pin,"wacom_rst");
+        gpio_direction_output(rst_pin,0);
+	gpio_set_value(rst_pin,0);
+	mdelay(100);
+	gpio_direction_output(ctl_pin,1);
         gpio_set_value(ctl_pin,1);
         mdelay(200);
         gpio_set_value(ctl_pin,0);
         mdelay(100);
 
-	gpio_request(rst_pin,"wacom_rst");
+	//gpio_request(rst_pin,"wacom_rst");
+	//gpio_direction_output(rst_pin,0);
 	gpio_set_value(rst_pin,0);
 	mdelay(500);	
 	gpio_set_value(rst_pin,1);
@@ -329,7 +342,9 @@ static int wacom_i2c_suspend(struct device *dev)
 	struct i2c_client *client = to_i2c_client(dev);
 
 	disable_irq(client->irq);
-
+	
+	gpio_set_value(rst_pin,0);
+	mdelay(100);
 	gpio_set_value(ctl_pin,1); // close power
 
 	return 0;
@@ -362,6 +377,12 @@ static const struct i2c_device_id wacom_i2c_id[] = {
 };
 MODULE_DEVICE_TABLE(i2c, wacom_i2c_id);
 
+static void wacom_i2c_shutdown(struct i2c_client *client)
+{
+	gpio_set_value(ctl_pin,1); 
+	gpio_set_value(rst_pin,0); 	
+}
+
 static struct i2c_driver wacom_i2c_driver = {
 	.driver	= {
 		.name	= "wacom_i2c",
@@ -371,6 +392,7 @@ static struct i2c_driver wacom_i2c_driver = {
 	.probe		= wacom_i2c_probe,
 	.remove		= wacom_i2c_remove,
 	.id_table	= wacom_i2c_id,
+ 	.shutdown       = wacom_i2c_shutdown,
 };
 
 static void wacom_i2c_exit(void)
