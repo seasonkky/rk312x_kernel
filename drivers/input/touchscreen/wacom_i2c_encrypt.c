@@ -172,6 +172,13 @@ static irqreturn_t wacom_i2c_irq(int irq, void *dev_id)
 		isPenDetected = 1;
 	else
 		isPenDetected = 0;
+
+	if(pressure > 4096)
+		goto out;
+
+	if(x < 0 || x > 6771 || y < 0|| y > 11012)
+		goto out;
+
 	if (!wac_i2c->prox)
 		wac_i2c->tool = (data[3] & 0x0c) ?
 			BTN_TOOL_RUBBER : BTN_TOOL_PEN;
@@ -270,20 +277,12 @@ static int wacom_i2c_probe(struct i2c_client *client,
 	ctl_pin = of_get_named_gpio_flags(np, "ctl_gpios", 0, (enum of_gpio_flags *)&irq_flags);
 
         gpio_request(ctl_pin,"wacom_ctl");
-        //gpio_direction_output(ctl_pin,1);
-
-	gpio_request(rst_pin,"wacom_rst");
-        gpio_direction_output(rst_pin,0);
-	gpio_set_value(rst_pin,0);
-	mdelay(100);
-	gpio_direction_output(ctl_pin,1);
-        gpio_set_value(ctl_pin,1);
-        mdelay(200);
-        gpio_set_value(ctl_pin,0);
+        gpio_direction_output(ctl_pin,0);
+    	gpio_set_value(ctl_pin,0);
         mdelay(100);
 
-	//gpio_request(rst_pin,"wacom_rst");
-	//gpio_direction_output(rst_pin,0);
+	gpio_request(rst_pin,"wacom_rst");
+    	gpio_direction_output(rst_pin,0);
 	gpio_set_value(rst_pin,0);
 	mdelay(500);	
 	gpio_set_value(rst_pin,1);
@@ -291,6 +290,7 @@ static int wacom_i2c_probe(struct i2c_client *client,
 	printk("##########leison wacom###rst low 500 high 100 ###### %s,%d\n",__func__,__LINE__);
 	//msleep(100);
 	printk("wacom irq_gpio is :%d\n",irq_pin);
+	gpio_request(irq_pin,"wacom_irq");
 	gpio_direction_input(irq_pin);
 	client->irq = gpio_to_irq(irq_pin);
 
@@ -379,6 +379,7 @@ MODULE_DEVICE_TABLE(i2c, wacom_i2c_id);
 
 static void wacom_i2c_shutdown(struct i2c_client *client)
 {
+	printk("wacom i2c shutdown\n");
 	gpio_set_value(ctl_pin,1); 
 	gpio_set_value(rst_pin,0); 	
 }
@@ -392,7 +393,7 @@ static struct i2c_driver wacom_i2c_driver = {
 	.probe		= wacom_i2c_probe,
 	.remove		= wacom_i2c_remove,
 	.id_table	= wacom_i2c_id,
- 	.shutdown       = wacom_i2c_shutdown,
+ 	//.shutdown       = wacom_i2c_shutdown,
 };
 
 static void wacom_i2c_exit(void)
