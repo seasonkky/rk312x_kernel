@@ -21,6 +21,11 @@
 #include <asm/unaligned.h>
 #include <linux/delay.h>
 #include <linux/of_gpio.h>
+#include <linux/platform_device.h>
+#include <linux/miscdevice.h>
+#include <linux/fcntl.h>
+#include <linux/input.h>
+#include <asm/uaccess.h>
 
 #define WACOM_CMD_QUERY0	0x04
 #define WACOM_CMD_QUERY1	0x00
@@ -50,6 +55,49 @@ struct wacom_i2c {
 	bool prox;
 	int tool;
 };
+
+struct wacom_i2c *gwac_i2c;
+#define WACOM_RST                                0x4800
+static long wacom_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+	printk("%s cmd = %d arg = %ld\n",__FUNCTION__,cmd, arg);
+
+	switch (cmd){
+		case WACOM_RST:
+			printk("wacom rst!\n");
+			disable_irq(gwac_i2c->client->irq);
+			gpio_set_value(rst_pin,0);
+        		mdelay(100);
+        		gpio_set_value(ctl_pin,1); // close power
+			mdelay(500);
+			//resume power
+		        gpio_set_value(ctl_pin,0);
+        		mdelay(100);
+
+        		gpio_set_value(rst_pin,0);
+        		mdelay(500);
+        		gpio_set_value(rst_pin,1);
+        		mdelay(100);
+			enable_irq(gwac_i2c->client->irq);
+			break;
+		default:
+			break;
+	}
+	return 0;
+}
+
+static struct file_operations wacom_control_fops = {
+	.owner   = THIS_MODULE,
+	.unlocked_ioctl   = wacom_ioctl,
+};
+
+static struct miscdevice wacom_control_misc =
+{
+    .minor = MISC_DYNAMIC_MINOR,
+    .name = "wacom_control",
+    .fops = &wacom_control_fops,
+};
+
 
 int y_max1 = 0;
 int x_max1 = 0;
@@ -314,6 +362,7 @@ static int wacom_i2c_probe(struct i2c_client *client,
 	}
 
 	i2c_set_clientdata(client, wac_i2c);
+	gwac_i2c = wac_i2c;
 	return 0;
 
 err_free_irq:
@@ -405,6 +454,8 @@ static void wacom_i2c_exit(void)
 static int wacom_i2c_init(void)
 {
 	printk(KERN_INFO "wacom chip initializing ....\n");
+	int ret;
+	ret = misc_register(&wacom_control_misc);
 	return i2c_add_driver(&wacom_i2c_driver);
 }
 
