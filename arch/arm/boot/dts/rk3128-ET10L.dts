@@ -212,16 +212,23 @@
 	pinctrl-1 = <&lcdc0_gpio>;
 
 	rockchip,fb-win-map = <FB_DEFAULT_ORDER>;
-	/*
+	
 	power_ctr: power_ctr {
-		rockchip,debug = <0>;
-		lcd_cs: lcd_cs {
-			rockchip,power_type = <GPIO>;
-			gpios = <&gpio0 GPIO_D0 GPIO_ACTIVE_HIGH>;
-			rockchip,delay = <10>;
-		};
+		rockchip,debug = <1>;
+		lcd_18:lcd18 {
+                        rockchip,power_type = <REGULATOR>;
+                        rockchip,regulator_name = "rk818_ldo5";
+                        rockchip,regulator_voltage = <1800000>;
+                        rockchip,delay = <5>;
+                };
+		lcd_33:lcd33 {
+                        rockchip,power_type = <REGULATOR>;
+                        rockchip,regulator_name = "rk818_ldo4";
+                        rockchip,regulator_voltage = <3300000>;
+                        rockchip,delay = <5>;
+                };
 	};
-	*/
+	
 };
 
 &hdmi {
@@ -230,7 +237,8 @@
 
 &dwc_control_usb {
 	usb_uart {
-		status = "ok";
+		//status = "ok";
+		status = "disabled";
 	};
 };
 &codec {

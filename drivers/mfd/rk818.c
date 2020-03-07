@@ -30,6 +30,13 @@
 #include <linux/regulator/machine.h>
 #include <linux/regmap.h>
 #include <linux/syscore_ops.h>
+#include <linux/regmap.h>
+#include <linux/regulator/of_regulator.h>
+#include <linux/regulator/consumer.h>
+#include <linux/regulator/driver.h>
+#include <linux/regulator/machine.h>
+#include <linux/module.h>
+
 
 
 #if 0
@@ -197,10 +204,24 @@ static int rk818_ldo_is_enabled(struct regulator_dev *dev)
 	else
 		return 0; 		
 }
+
+static const char *rdev_get_name(struct regulator_dev *rdev)
+{
+        if (rdev->constraints && rdev->constraints->name)
+                return rdev->constraints->name;
+        else if (rdev->desc->name)
+                return rdev->desc->name;
+        else
+                return "";
+}
+
 static int rk818_ldo_enable(struct regulator_dev *dev)
 {
 	struct rk818 *rk818 = rdev_get_drvdata(dev);
 	int ldo= rdev_get_id(dev) - RK818_LDO1;
+
+	char *regulator_name = rdev_get_name(dev);
+	printk("cuikai rk818_ldo_enable:%s,ldo:%d\n",regulator_name,ldo);
 
 	if (ldo == 8)
 		 rk818_set_bits(rk818, RK818_DCDC_EN_REG, 1 << 5, 1 << 5); //ldo9
@@ -215,6 +236,8 @@ static int rk818_ldo_disable(struct regulator_dev *dev)
 {
 	struct rk818 *rk818 = rdev_get_drvdata(dev);
 	int ldo= rdev_get_id(dev) - RK818_LDO1;
+	char *regulator_name = rdev_get_name(dev);
+	printk("cuikai rk818_ldo_disable:%s,ldo:%d\n",regulator_name,ldo);
 
 	if (ldo == 8)
 		 rk818_set_bits(rk818, RK818_DCDC_EN_REG, 1 << 5, 1 << 0); //ldo9
@@ -225,6 +248,18 @@ static int rk818_ldo_disable(struct regulator_dev *dev)
 
 	 return 0;
 }
+
+void rk818_ldo_below(int ldo,int value)
+{
+	int real_ldo = ldo - 1;
+	printk("rk818_ldo_below ldo:%d,value:%d\n",ldo,value);
+	if(value == 1)
+		rk818_set_bits(g_rk818,RK818_LDO_EN_REG,1 << real_ldo, 1 << real_ldo);
+	else if(value == 0)
+		rk818_set_bits(g_rk818,RK818_LDO_EN_REG,1 << real_ldo, 0);
+}
+EXPORT_SYMBOL_GPL(rk818_ldo_below);
+
 static int rk818_ldo_get_voltage(struct regulator_dev *dev)
 {
 	struct rk818 *rk818 = rdev_get_drvdata(dev);

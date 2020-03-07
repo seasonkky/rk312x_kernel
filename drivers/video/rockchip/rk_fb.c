@@ -31,6 +31,7 @@
 #include <linux/linux_logo.h>
 #include <linux/dma-mapping.h>
 #include <linux/regulator/consumer.h>
+#include <linux/mfd/rk818.h>
 
 #include "bmp_helper.h"
 
@@ -395,87 +396,15 @@ int rk_disp_pwr_ctr_parse_dt(struct rk_lcdc_driver *dev_drv)
 
 int rk_disp_pwr_enable(struct rk_lcdc_driver *dev_drv)
 {
-	struct list_head *pos;
-	struct rk_disp_pwr_ctr_list *pwr_ctr_list;
-	struct pwr_ctr *pwr_ctr;
-	struct regulator *regulator_lcd = NULL;
-	int count = 10;
-
-	if (list_empty(&dev_drv->pwrlist_head))
-		return 0;
-	list_for_each(pos, &dev_drv->pwrlist_head) {
-		pwr_ctr_list = list_entry(pos, struct rk_disp_pwr_ctr_list,
-					  list);
-		pwr_ctr = &pwr_ctr_list->pwr_ctr;
-		if (pwr_ctr->type == GPIO) {
-			gpio_direction_output(pwr_ctr->gpio, pwr_ctr->atv_val);
-			mdelay(pwr_ctr->delay);
-		} else if (pwr_ctr->type == REGULATOR) {
-			if (pwr_ctr->rgl_name)
-				regulator_lcd =
-					regulator_get(NULL, pwr_ctr->rgl_name);
-			if (regulator_lcd == NULL) {
-				dev_err(dev_drv->dev,
-					"%s: regulator get failed,regulator name:%s\n",
-					__func__, pwr_ctr->rgl_name);
-				continue;
-			}
-			regulator_set_voltage(regulator_lcd, pwr_ctr->volt, pwr_ctr->volt);
-			while (!regulator_is_enabled(regulator_lcd)) {
-				if (regulator_enable(regulator_lcd) == 0 || count == 0)
-					break;
-				else
-					dev_err(dev_drv->dev,
-						"regulator_enable failed,count=%d\n",
-						count);
-				count--;
-			}
-			regulator_put(regulator_lcd);
-			msleep(pwr_ctr->delay);
-		}
-	}
-
+	rk818_ldo_below(4,1);
+	rk818_ldo_below(5,1);
 	return 0;
 }
 
 int rk_disp_pwr_disable(struct rk_lcdc_driver *dev_drv)
 {
-	struct list_head *pos;
-	struct rk_disp_pwr_ctr_list *pwr_ctr_list;
-	struct pwr_ctr *pwr_ctr;
-	struct regulator *regulator_lcd = NULL;
-	int count = 10;
-
-	if (list_empty(&dev_drv->pwrlist_head))
-		return 0;
-	list_for_each(pos, &dev_drv->pwrlist_head) {
-		pwr_ctr_list = list_entry(pos, struct rk_disp_pwr_ctr_list,
-					  list);
-		pwr_ctr = &pwr_ctr_list->pwr_ctr;
-		if (pwr_ctr->type == GPIO) {
-			gpio_set_value(pwr_ctr->gpio, !pwr_ctr->atv_val);
-		} else if (pwr_ctr->type == REGULATOR) {
-			if (pwr_ctr->rgl_name)
-				regulator_lcd = regulator_get(NULL, pwr_ctr->rgl_name);
-			if (regulator_lcd == NULL) {
-				dev_err(dev_drv->dev,
-					"%s: regulator get failed,regulator name:%s\n",
-					__func__, pwr_ctr->rgl_name);
-				continue;
-			}
-			while (regulator_is_enabled(regulator_lcd) > 0) {
-				if (regulator_disable(regulator_lcd) == 0 ||
-				    count == 0)
-					break;
-				else
-					dev_err(dev_drv->dev,
-						"regulator_disable failed,count=%d\n",
-						count);
-				count--;
-			}
-			regulator_put(regulator_lcd);
-		}
-	}
+	rk818_ldo_below(4,0);
+	rk818_ldo_below(5,0);
 	return 0;
 }
 
