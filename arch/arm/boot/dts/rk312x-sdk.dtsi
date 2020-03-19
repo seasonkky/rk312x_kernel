@@ -201,6 +201,12 @@
                 irq_gpios = <&gpio2 GPIO_C2 IRQ_TYPE_LEVEL_LOW>;
                 reset_gpios = <&gpio2 GPIO_C3 GPIO_ACTIVE_LOW>;
 		ctl_gpios = <&gpio2 GPIO_C0 GPIO_ACTIVE_LOW>;
+		charge_gpios = <&gpio0 GPIO_B1 GPIO_ACTIVE_HIGH>;
+		charge1_gpios = <&gpio2 GPIO_B7 GPIO_ACTIVE_HIGH>;
+		charge2_gpios = <&gpio1 GPIO_C5 GPIO_ACTIVE_HIGH>;
+		charge3_gpios = <&gpio2 GPIO_B6 GPIO_ACTIVE_HIGH>;
+		charge4_gpios = <&gpio2 GPIO_B0 GPIO_ACTIVE_HIGH>;
+		fourinone_gpios = <&gpio1 GPIO_B7 GPIO_ACTIVE_HIGH>;
                 max-x = <720>;
                 max-y = <1280>;
                 tp-size = <0>;
