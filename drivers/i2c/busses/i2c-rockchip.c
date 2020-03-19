@@ -1026,6 +1026,7 @@ static struct platform_driver rockchip_i2c_driver = {
 	},
 };
 
+#if 0
 /*
  * rockchip_i2c_shutdown
  * called when device is shutdown from the bus
@@ -1045,13 +1046,13 @@ static void rockchip_i2c_shutdown(void)
 static struct syscore_ops rk_i2c_syscore_ops = {
 	.shutdown = rockchip_i2c_shutdown,
 };
-
+#endif
 static int __init rockchip_i2c_init_driver(void)
 {
 	struct rockchip_i2c_data *data = rockchip_i2c_get_data();
 
 	data->num = 0;
-	register_syscore_ops(&rk_i2c_syscore_ops);
+	//register_syscore_ops(&rk_i2c_syscore_ops);
 
 	return platform_driver_register(&rockchip_i2c_driver);
 }
