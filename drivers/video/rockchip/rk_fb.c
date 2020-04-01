@@ -396,14 +396,16 @@ int rk_disp_pwr_ctr_parse_dt(struct rk_lcdc_driver *dev_drv)
 
 int rk_disp_pwr_enable(struct rk_lcdc_driver *dev_drv)
 {
-	rk818_ldo_below(4,1);
 	rk818_ldo_below(5,1);
+	mdelay(100);
+	rk818_ldo_below(4,1);
 	return 0;
 }
 
 int rk_disp_pwr_disable(struct rk_lcdc_driver *dev_drv)
 {
 	rk818_ldo_below(4,0);
+	mdelay(100);
 	rk818_ldo_below(5,0);
 	return 0;
 }
