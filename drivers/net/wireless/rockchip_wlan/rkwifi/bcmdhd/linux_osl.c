@@ -288,29 +288,29 @@ static int16 linuxbcmerrormap[] =
 #if 1
 static inline void *
 pci_alloc_consistent1(struct pci_dev *hwdev, size_t size,
-                     dma_addr_t *dma_handle)
+						dma_addr_t *dma_handle)
 {
-        return dma_alloc_coherent(hwdev == NULL ? NULL : &hwdev->dev, size, dma_handle, GFP_ATOMIC);
+	return dma_alloc_coherent(hwdev == NULL ? NULL : &hwdev->dev, size, dma_handle, GFP_ATOMIC);
 }
 
 static inline dma_addr_t
 pci_map_single1(struct pci_dev *hwdev, void *ptr, size_t size, int direction)
 {
-        return dma_map_single(hwdev == NULL ? NULL : &hwdev->dev, ptr, size, (enum dma_data_direction)direction);
+	return dma_map_single(hwdev == NULL ? NULL : &hwdev->dev, ptr, size, (enum dma_data_direction)direction);
 }
 
 static inline void
 pci_free_consistent1(struct pci_dev *hwdev, size_t size,
-                    void *vaddr, dma_addr_t dma_handle)
+						void *vaddr, dma_addr_t dma_handle)
 {
-        dma_free_coherent(hwdev == NULL ? NULL : &hwdev->dev, size, vaddr, dma_handle);
+	dma_free_coherent(hwdev == NULL ? NULL : &hwdev->dev, size, vaddr, dma_handle);
 }
 
 static inline void
 pci_unmap_single1(struct pci_dev *hwdev, dma_addr_t dma_addr,
-                 size_t size, int direction)
+					size_t size, int direction)
 {
-        dma_unmap_single(hwdev == NULL ? NULL : &hwdev->dev, dma_addr, size, (enum dma_data_direction)direction);
+	dma_unmap_single(hwdev == NULL ? NULL : &hwdev->dev, dma_addr, size, (enum dma_data_direction)direction);
 }
 #endif
 

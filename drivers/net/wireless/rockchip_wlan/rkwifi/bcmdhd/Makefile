@@ -15,7 +15,7 @@ DHDCFLAGS = -Wall -Wstrict-prototypes -Dlinux -DBCMDRIVER -DSDTEST       \
 	-DWIFI_ACT_FRAME -DARP_OFFLOAD_SUPPORT -DSUPPORT_PM2_ONLY             \
 	-DKEEP_ALIVE -DPKT_FILTER_SUPPORT -DPNO_SUPPORT -DDHDTCPACK_SUPPRESS  \
 	-DDHD_DONOT_FORWARD_BCMEVENT_AS_NETWORK_PKT -DRXFRAME_THREAD          \
-	-DSWTXGLOM                                                            \
+	-DBCMSDIOH_TXGLOM_EXT -DWL_EXT_IAPSTA                                 \
 	-DENABLE_INSMOD_NO_FW_LOAD                                            \
 	-Idrivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd \
 	-Idrivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd/include
@@ -24,7 +24,7 @@ DHDOFILES = aiutils.o siutils.o sbutils.o bcmutils.o bcmwifi_channels.o \
 	dhd_linux.o dhd_linux_platdev.o dhd_linux_sched.o dhd_pno.o \
 	dhd_common.o dhd_ip.o dhd_linux_wq.o dhd_custom_gpio.o \
 	bcmevent.o hndpmu.o linux_osl.o wldev_common.o wl_android.o \
-	hnd_pktq.o hnd_pktpool.o dhd_config.o
+	hnd_pktq.o hnd_pktpool.o dhd_config.o wl_android_ext.o
 
 ifneq ($(CONFIG_BCMDHD_SDIO),)
 DHDCFLAGS += \
@@ -36,7 +36,7 @@ DHDOFILES += bcmsdh.o bcmsdh_linux.o bcmsdh_sdmmc.o bcmsdh_sdmmc_linux.o \
 	dhd_sdio.o dhd_cdc.o dhd_wlfc.o
 
 ifeq ($(CONFIG_BCMDHD_OOB),y)
-DHDCFLAGS += -DOOB_INTR_ONLY -DHW_OOB -DCUSTOMER_OOB
+DHDCFLAGS += -DOOB_INTR_ONLY -DCUSTOMER_OOB -DHW_OOB
 ifeq ($(CONFIG_BCMDHD_DISABLE_WOWLAN),y)
 DHDCFLAGS += -DDISABLE_WOWLAN
 endif
@@ -56,7 +56,7 @@ endif
 
 $(MODULE_NAME)-y += $(DHDOFILES)
 
-#ifeq ($(CONFIG_MACH_ODROID_4210),y)
+#ifeq ($(CONFIG_MACH_PLATFORM),y)
 DHDOFILES += dhd_gpio.o
 DHDCFLAGS += -DCUSTOMER_HW -DDHD_OF_SUPPORT -DGET_CUSTOM_MAC_ENABLE
 #DHDCFLAGS += -DBCMWAPI_WPI -DBCMWAPI_WAI
@@ -65,14 +65,13 @@ DHDCFLAGS += -DCUSTOMER_HW -DDHD_OF_SUPPORT -DGET_CUSTOM_MAC_ENABLE
 #DHDCFLAGS += -DBAND_AG
 
 ifeq ($(CONFIG_DHD_USE_STATIC_BUF),y)
-# add dhd_static_buf to kernel image build
-#DHDOFILES += dhd_static_buf.o
+obj-m += dhd_static_buf.o
 DHDCFLAGS += -DSTATIC_WL_PRIV_STRUCT -DENHANCED_STATIC_BUF
 endif
 
 ifneq ($(CONFIG_WIRELESS_EXT),)
-DHDOFILES += wl_iw.o
-DHDCFLAGS += -DSOFTAP -DWL_WIRELESS_EXT -DUSE_IW
+DHDOFILES += wl_iw.o wl_escan.o
+DHDCFLAGS += -DSOFTAP -DWL_WIRELESS_EXT -DUSE_IW -DWL_ESCAN
 endif
 ifneq ($(CONFIG_CFG80211),)
 DHDOFILES += wl_cfg80211.o wl_cfgp2p.o wl_linux_mon.o wl_cfg_btcoex.o
