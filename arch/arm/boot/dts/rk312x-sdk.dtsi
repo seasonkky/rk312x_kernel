@@ -472,6 +472,8 @@
 	rk818,system-power-controller;
 	rk818,support_dc_chg = <1>;/*1: dc chg; 0:usb chg*/
 
+	pinctrl-names = "default";
+        pinctrl-0 = <&gpio_1c4>;
 	regulators {
 
 		rk818_dcdc1_reg: regulator@0{
@@ -648,6 +650,7 @@
                 power_dc2otg = <0>;
 		dc_det_adc = <1>;
 		io-channels = <&adc 0>;
+		dc_det_gpio = <&gpio1 GPIO_C4 GPIO_ACTIVE_LOW>;
 		chg_red_gpio = <&gpio2 GPIO_B0 GPIO_ACTIVE_LOW>;
         };
         test-power{

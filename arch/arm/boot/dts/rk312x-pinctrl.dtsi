@@ -950,6 +950,10 @@
 				rockchip,pins = <FUNC_TO_GPIO(LCDC0_D14)>;
 				rockchip,pull = <VALUE_PULL_DEFAULT>; 
 			};
+			gpio_1c4: gpio-1c4 {
+				rockchip,pins = <GPIO1_C4>;
+				rockchip,pull = <VALUE_PULL_UPDOWN_DISABLE>;
+			};
 		};	
 	};	
 

@@ -51,8 +51,6 @@
 #include <linux/usb/phy.h>
 #include <linux/fb.h>
 
-#include <linux/iio/consumer.h>
-#include <linux/iio/iio.h>
 #if defined(CONFIG_X86_INTEL_SOFIA)
 #include <linux/usb/phy-intel.h>
 #else
@@ -66,7 +64,6 @@ just be: "static int dbg_enable;" is ok*/
 static int dbg_enable;
 #define RK818_SYS_DBG 1
 
-#define DC_ADC_TRIGGER			150
 module_param_named(dbg_level, dbg_enable, int, 0644);
 
 #define DBG(args...) \
@@ -203,7 +200,6 @@ struct rk81x_battery {
 
 	int				dc_det_pin;
 	int				dc_det_level;
-	struct iio_channel		*iio_chan;
 	int				dc_det_irq;
 	int				irq;
 	int				ac_online;
@@ -340,7 +336,6 @@ struct rk81x_battery {
 	unsigned long			dischrg_save_sec;
 	unsigned long			chrg_save_sec;
 	struct timeval			suspend_rtc_base;
-	int                             chg_red_pin;
 };
 
 u32 support_usb_adp, support_dc_adp, power_dc2otg;
@@ -1600,13 +1595,13 @@ static int rk81x_bat_power_supply_init(struct rk81x_battery *di)
 		dev_err(di->dev, "failed to register main battery\n");
 		goto batt_failed;
 	}
-	/*
+/*
 	ret = power_supply_register(di->dev, &di->usb);
 	if (ret) {
 		dev_err(di->dev, "failed to register usb power supply\n");
 		goto usb_failed;
 	}
-	*/
+*/
 	ret = power_supply_register(di->dev, &di->ac);
 	if (ret) {
 		dev_err(di->dev, "failed to register ac power supply\n");
@@ -1869,48 +1864,14 @@ out:
 	return charger_type;
 }
 
-static enum charger_type rk816_bat_get_adc_dc_state(struct rk81x_battery *di)
-{
-	int val = 0;
-	struct iio_channel *channels;
-	struct iio_channel *adc_test_channel; 
-	struct platform_device *pdev;
-
-	if (!di->iio_chan) {
-		di->iio_chan = iio_channel_get(di->rk818->dev, NULL);
-		if (IS_ERR(di->iio_chan)) {
-			pr_err("no channel====\n");
-			di->iio_chan = NULL;
-			return 0;//DC_TYPE_NONE_CHARGER;
-		}
-	}
-
-	if (iio_read_channel_raw(di->iio_chan, &val) < 0) {
-		pr_err("read channel error\n");
-		return 0;//DC_TYPE_NONE_CHARGER;
-	}
-
-	return (val >= DC_ADC_TRIGGER) ? DC_CHARGER : NO_CHARGER;
-}
 static void rk81x_battery_dc_delay_work(struct work_struct *work)
 {
 	enum charger_type charger_type;
 	struct rk81x_battery *di = container_of(work,
 				struct rk81x_battery, dc_det_check_work.work);
 
-	static int sta_bak=-1;
 	charger_type = rk81x_bat_get_dc_state(di);
 
-	charger_type = rk816_bat_get_adc_dc_state(di);
-	if(charger_type == DC_CHARGER)
-		gpio_set_value(di->chg_red_pin,1);
-	else if (charger_type == NO_CHARGER)
-		gpio_set_value(di->chg_red_pin,0);
-
-	if(charger_type!=sta_bak) {
-		rk_send_wakeup_key();
-		sta_bak=charger_type;
-	}
 	if (charger_type == DC_CHARGER) {
 		rk81x_bat_set_charger_param(di, DC_CHARGER);
 		if (power_dc2otg && di->otg_online)
@@ -1925,8 +1886,6 @@ static void rk81x_battery_dc_delay_work(struct work_struct *work)
 					   msecs_to_jiffies(10));
 		}
 	}
-	queue_delayed_work(di->wq, &di->dc_det_check_work,
-			   msecs_to_jiffies(1000));
 }
 
 static void rk81x_battery_acusb_delay_work(struct work_struct *work)
@@ -3528,7 +3487,7 @@ static void rk81x_bat_power_supply_changed(struct rk81x_battery *di)
 			di->psy_status = POWER_SUPPLY_STATUS_FULL;
 		else
 			di->psy_status = POWER_SUPPLY_STATUS_CHARGING;
-	} 
+	}
 
 	if (state_changed) {
 		power_supply_changed(&di->bat);
@@ -4178,7 +4137,6 @@ static int rk81x_bat_parse_dt(struct rk81x_battery *di)
 		dev_err(dev, "invalid ocv table\n");
 		return -EINVAL;
 	}
-	rk818->dev->of_node=np;
 
 	size = sizeof(*pdata->battery_ocv) * pdata->ocv_size;
 
@@ -4284,19 +4242,6 @@ static int rk81x_bat_parse_dt(struct rk81x_battery *di)
 		out_value = PWR_OFF_THRESD;
 	}
 	pdata->power_off_thresd = out_value;
-
-
-	enum of_gpio_flags flags;
-
-	di->chg_red_pin = of_get_named_gpio_flags(np, "chg_red_gpio", 0,&flags);
-	if (di->chg_red_pin == -EPROBE_DEFER) {
-                dev_err(dev, "chg_red_pin error\n");
-        } else {
-		gpio_request(di->chg_red_pin,"chg_red");
-                gpio_direction_output(di->chg_red_pin,0);
-		gpio_set_value(di->chg_red_pin,0);
-	}
-	
 
 	of_property_read_u32(np, "chrg_diff_voltagemV", &pdata->chrg_diff_vol);
 	of_property_read_u32(np, "virtual_power", &di->fg_drv_mode);
