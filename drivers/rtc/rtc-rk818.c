@@ -603,7 +603,7 @@ static int rk818_rtc_probe(struct platform_device *pdev)
 //		DBG( "set RTC date/time %4d-%02d-%02d(%d) %02d:%02d:%02d\n",1900 + tm_def.tm_year, tm_def.tm_mon + 1, tm_def.tm_mday, tm_def.tm_wday,tm_def.tm_hour, tm_def.tm_min, tm_def.tm_sec);
 	}
 
-	device_init_wakeup(&pdev->dev, 1);
+	device_init_wakeup(&pdev->dev, 0);
 
 	rk818_rtc->rtc = rtc_device_register("rk818", &pdev->dev,
 					      &rk818_rtc_ops, THIS_MODULE);
