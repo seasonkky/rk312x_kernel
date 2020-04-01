@@ -336,6 +336,7 @@ struct rk81x_battery {
 	unsigned long			dischrg_save_sec;
 	unsigned long			chrg_save_sec;
 	struct timeval			suspend_rtc_base;
+	int                             chg_red_pin;
 };
 
 u32 support_usb_adp, support_dc_adp, power_dc2otg;
@@ -1534,6 +1535,17 @@ static int rk81x_battery_ac_get_property(struct power_supply *psy,
 		if (rk81x_chrg_online(di))
 			rk81x_bat_lowpwr_check(di);
 		val->intval = di->ac_online;	/*discharging*/
+		printk("cuikai val->intval:%d\n",val->intval);
+		if(val->intval == 0)
+		{
+			gpio_direction_output(di->chg_red_pin,0);
+	               	gpio_set_value(di->chg_red_pin,0);
+		} 
+		else
+		{
+			gpio_direction_output(di->chg_red_pin,1);
+                        gpio_set_value(di->chg_red_pin,1);
+		}
 		if (di->fg_drv_mode == TEST_POWER_MODE)
 			val->intval = TEST_AC_ONLINE;
 
@@ -4242,6 +4254,18 @@ static int rk81x_bat_parse_dt(struct rk81x_battery *di)
 		out_value = PWR_OFF_THRESD;
 	}
 	pdata->power_off_thresd = out_value;
+
+
+	enum of_gpio_flags flags;
+
+       di->chg_red_pin = of_get_named_gpio_flags(np, "chg_red_gpio", 0,&flags);
+       if (di->chg_red_pin == -EPROBE_DEFER) {
+                dev_err(dev, "chg_red_pin error\n");
+        } else {
+               gpio_request(di->chg_red_pin,"chg_red");
+                gpio_direction_output(di->chg_red_pin,0);
+               gpio_set_value(di->chg_red_pin,0);
+       }
 
 	of_property_read_u32(np, "chrg_diff_voltagemV", &pdata->chrg_diff_vol);
 	of_property_read_u32(np, "virtual_power", &di->fg_drv_mode);

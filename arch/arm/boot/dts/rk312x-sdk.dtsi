@@ -645,12 +645,10 @@
                 power_off_thresd = <3400>;
                 chrg_diff_voltagemV = <0>;
                 virtual_power = <0>;
-                support_usb_adp = <0>;
-                support_dc_adp = <1>;
+                support_usb_adp = <1>;
+                support_dc_adp = <0>;
                 power_dc2otg = <0>;
-		dc_det_adc = <1>;
-		io-channels = <&adc 0>;
-		dc_det_gpio = <&gpio1 GPIO_C4 GPIO_ACTIVE_LOW>;
+		dc_det_gpio = <&gpio1 GPIO_C4 GPIO_ACTIVE_HIGH>;
 		chg_red_gpio = <&gpio2 GPIO_B0 GPIO_ACTIVE_LOW>;
         };
         test-power{
