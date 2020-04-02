@@ -125,7 +125,7 @@
 
 	wireless-wlan {
                 compatible = "wlan-platdata";
-                wifi_chip_type = "ap6212";
+                wifi_chip_type = "ap6236";
                 //sdio_vref = <3300>; //1800mv or 3300mv
                 //keep_wifi_power_on;
 
@@ -145,7 +145,7 @@
 
                 //BT,power_gpio = <&gpio1 GPIO_A3 GPIO_ACTIVE_LOW>;
                 BT,reset_gpio = <&gpio3 GPIO_C5 GPIO_ACTIVE_HIGH>;
-                BT,wake_gpio = <&gpio3 GPIO_C4 GPIO_ACTIVE_HIGH>;
+                BT,wake_gpio = <&gpio3 GPIO_D2 GPIO_ACTIVE_HIGH>;
                 BT,wake_host_irq = <&gpio3 GPIO_C6 GPIO_ACTIVE_HIGH>;
 
                 status = "okay";
