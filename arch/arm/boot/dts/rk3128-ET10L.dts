@@ -142,6 +142,7 @@
                 pinctrl-names = "default","rts_gpio";
                 pinctrl-0 = <&uart0_rts>;
                 pinctrl-1 = <&uart0_rts_gpio>;
+		pinctrl-2 = <&gpio_3d2>;
 
                 //BT,power_gpio = <&gpio1 GPIO_A3 GPIO_ACTIVE_LOW>;
                 BT,reset_gpio = <&gpio3 GPIO_C5 GPIO_ACTIVE_HIGH>;

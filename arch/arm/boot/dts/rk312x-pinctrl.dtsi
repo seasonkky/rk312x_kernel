@@ -954,6 +954,10 @@
 				rockchip,pins = <GPIO1_C4>;
 				rockchip,pull = <VALUE_PULL_UPDOWN_DISABLE>;
 			};
+			gpio_3d2: gpio-3d2 {
+                                rockchip,pins = <GPIO3_D2>;
+                                rockchip,pull = <VALUE_PULL_UP>;
+                        };
 		};	
 	};	
 
