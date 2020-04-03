@@ -1284,18 +1284,23 @@ static void rk81x_bat_set_power_supply_state(struct rk81x_battery *di,
 	switch (charger_type) {
 	case NO_CHARGER:
 		di->psy_status = POWER_SUPPLY_STATUS_DISCHARGING;
+		gpio_set_value(di->chg_red_pin,0);
 		break;
 	case USB_CHARGER:
 		di->usb_online = ONLINE;
 		di->psy_status = POWER_SUPPLY_STATUS_CHARGING;
+		gpio_set_value(di->chg_red_pin,0);
 		break;
 	case DC_CHARGER:/*treat dc as ac*/
+		gpio_set_value(di->chg_red_pin,1);
 		di->dc_online = ONLINE;
 	case AC_CHARGER:
+		gpio_set_value(di->chg_red_pin,1);
 		di->ac_online = ONLINE;
 		di->psy_status = POWER_SUPPLY_STATUS_CHARGING;
 		break;
 	default:
+		gpio_set_value(di->chg_red_pin,0);
 		di->psy_status = POWER_SUPPLY_STATUS_DISCHARGING;
 	}
 
@@ -1535,17 +1540,6 @@ static int rk81x_battery_ac_get_property(struct power_supply *psy,
 		if (rk81x_chrg_online(di))
 			rk81x_bat_lowpwr_check(di);
 		val->intval = di->ac_online;	/*discharging*/
-		printk("cuikai val->intval:%d\n",val->intval);
-		if(val->intval == 0)
-		{
-			gpio_direction_output(di->chg_red_pin,0);
-	               	gpio_set_value(di->chg_red_pin,0);
-		} 
-		else
-		{
-			gpio_direction_output(di->chg_red_pin,1);
-                        gpio_set_value(di->chg_red_pin,1);
-		}
 		if (di->fg_drv_mode == TEST_POWER_MODE)
 			val->intval = TEST_AC_ONLINE;
 
