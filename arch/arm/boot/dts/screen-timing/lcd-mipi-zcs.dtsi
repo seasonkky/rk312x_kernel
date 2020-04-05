@@ -8,14 +8,16 @@
  * resolution: 768 X 1024
  * mipi channel: single
  */
-#include "include/dt-bindings/rkmipi/mipi_dsi.h"
+//#include "include/dt-bindings/rkmipi/mipi_dsi.h"
+#define HSDT                    0x00
+#define LPDT                    0x01
 / {
 		/* about mipi */
 		disp_mipi_init: mipi_dsi_init{
 					compatible = "rockchip,mipi_dsi_init";
 					rockchip,screen_init	= <1>;
 					rockchip,dsi_lane		= <4>;
-					rockchip,dsi_hs_clk		= <500>;
+					rockchip,dsi_hs_clk		= <480>;
 					rockchip,mipi_dsi_num	= <1>;
 		};
 		disp_mipi_power_ctr: mipi_power_ctr {
@@ -1357,7 +1359,7 @@ rockchip,on-cmds162 {
 							rockchip,cmd_type = <LPDT>;
 							rockchip,dsi_id = <0>;
 							rockchip,cmd = <0x15 0x11 0x00>;
-							rockchip,cmd_delay = <120>;
+							rockchip,cmd_delay = <200>;
 					};
 					rockchip,on-cmds189 {
 							compatible = "rockchip,on-cmds";
@@ -1401,7 +1403,7 @@ rockchip,on-cmds162 {
 				vfront-porch = <16>;
 
 				hsync-active = <0>;
-				vsync-active = <1>;
+				vsync-active = <0>;
 				de-active = <0>;
 				pixelclk-active = <0>;
 				swap-rb = <0>;
